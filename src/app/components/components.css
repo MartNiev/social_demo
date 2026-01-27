@@ -1,0 +1,43 @@
+.bt {
+  height: 100%;
+}
+.bt:hover {
+  width: 150px;
+  opacity: 80%;
+}
+
+.bt:active {
+  background-color: rgb(245, 252, 255);
+  color: rgb(63, 63, 63);
+}
+
+.name {
+  font-size: 180px;
+}
+
+.regButton {
+  border: solid 1px rgb(236, 236, 236);
+  padding: 12px;
+  border-radius: 20px;
+  background-color: rgb(236, 236, 236);
+}
+
+.regButton:hover {
+  opacity: 80%;
+}
+
+.regButton:active {
+  background-color: rgb(245, 252, 255);
+  color: rgb(63, 63, 63);
+}
+
+.formInput {
+  border: solid 1px rgb(182, 182, 182);
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.formMessage {
+  color: red;
+  font-size: 14px;
+}
