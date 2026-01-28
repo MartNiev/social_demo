@@ -1,13 +1,10 @@
-import { setCurrentUser } from "@/app/utils/userProfile";
-import createProfile from "@/app/utils/userProfile";
-import { getFirstDynamicReason } from "next/dist/server/app-render/dynamic-rendering";
+"use client";
 import { useState, useEffect, use } from "react";
 import { validateLogin } from "@/app/utils/validation";
-import { findProfile } from "@/app/utils/validation";
 
-function SignupScreen() {
+function SignupScreen({ setUserInfo }) {
   const [passwordMatch, setPasswordMatch] = useState(true);
-  const [userInfo, setUserInfo] = useState({
+  const [userInput, setUserInput] = useState({
     firstname: "",
     lastname: "",
     age: "",
@@ -16,24 +13,32 @@ function SignupScreen() {
     confirm: "",
   });
 
-  useEffect(() => {
-    // console.log(userInfo);
-  }, [userInfo]);
+  function handleSignUp() {
+    if (userInput.password !== userInput.confirm) {
+      setPasswordMatch(false);
+      return;
+    } else {
+      setPasswordMatch(true);
+      setUserInfo(userInput);
+    }
 
-  function signingUp() {
-    if (userInfo.password !== userInfo.confirm) return setPasswordMatch(false);
-    else setPasswordMatch(true);
+    async function saveProfile(profileObj) {
+      try {
+        const response = await fetch("/api/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(profileObj),
+        });
 
-    createProfile(userInfo);
+        if (response.ok) {
+          alert("JSON saved!");
+        }
+      } catch (error) {
+        alert("Error saving profile: " + error.message);
+      }
+    }
 
-    setUserInfo({
-      firstname: "",
-      lastname: "",
-      age: "",
-      username: "",
-      password: "",
-      confirm: "",
-    });
+    saveProfile(userInput);
   }
 
   return (
@@ -51,7 +56,7 @@ function SignupScreen() {
           type="text"
           placeholder="First Name"
           onChange={(e) => {
-            setUserInfo({ ...userInfo, firstname: e.target.value });
+            setUserInput({ ...userInput, firstname: e.target.value });
           }}
         />
         <input
@@ -59,7 +64,7 @@ function SignupScreen() {
           type="text"
           placeholder="Last Name"
           onChange={(e) => {
-            setUserInfo({ ...userInfo, lastname: e.target.value });
+            setUserInput({ ...userInput, lastname: e.target.value });
           }}
         />
         <input
@@ -67,7 +72,7 @@ function SignupScreen() {
           type="number"
           placeholder="Age"
           onChange={(e) => {
-            setUserInfo({ ...userInfo, age: e.target.value });
+            setUserInput({ ...userInput, age: e.target.value });
           }}
         />
         <input
@@ -75,7 +80,7 @@ function SignupScreen() {
           type="text"
           placeholder="Username"
           onChange={(e) => {
-            setUserInfo({ ...userInfo, username: e.target.value });
+            setUserInput({ ...userInput, username: e.target.value });
           }}
         />
         <input
@@ -83,7 +88,7 @@ function SignupScreen() {
           type="password"
           placeholder="Password"
           onChange={(e) => {
-            setUserInfo({ ...userInfo, password: e.target.value });
+            setUserInput({ ...userInput, password: e.target.value });
           }}
         />
         <input
@@ -91,13 +96,14 @@ function SignupScreen() {
           type="password"
           placeholder="Confirm"
           onChange={(e) => {
-            setUserInfo({ ...userInfo, confirm: e.target.value });
+            setUserInput({ ...userInput, confirm: e.target.value });
           }}
         />
         <button
-          type={passwordMatch ? "submit" : "button"}
+          type="button"
+          // type={passwordMatch ? "submit" : "button"}
           className="w-30 regButton"
-          onClick={signingUp}
+          onClick={handleSignUp}
         >
           Submit
         </button>
@@ -106,31 +112,23 @@ function SignupScreen() {
   );
 }
 
-function LoginScreen() {
+function LoginScreen({ userInfo, setProfile }) {
   const [loginInfo, setLoginInfo] = useState({ username: "", password: "" });
-  const [userExist, setUserExist] = useState(true);
   const [userValidated, setUserValidated] = useState(null);
 
-  useEffect(() => {
-    localStorage.setItem("currentUser", loginInfo.username);
-  }, [userValidated]);
-
   function handleLogin() {
-    setUserExist(findProfile(loginInfo.username));
-
-    userExist && setUserValidated(validateLogin(loginInfo));
-
-    userValidated && alert("Logged in");
+    setUserValidated(validateLogin(loginInfo));
+    userValidated && setProfile(userInfo);
   }
 
   return (
     <>
-      {!userExist && (
+      {/* {!userExist && (
         <p className="formMessage">
           Username or Password Does Not Match Our records
         </p>
-      )}
-      {!userValidated && (
+      )} */}
+      {!userValidated === false && (
         <p className="formMessage">Username or Password is incorrect</p>
       )}
       <form className="flex flex-col items-center gap-5 p-4">
@@ -163,8 +161,9 @@ function LoginScreen() {
   );
 }
 
-export default function Signup() {
+export default function Signup({ setProfile }) {
   const [form, setForm] = useState(true);
+  const [userInfo, setUserInfo] = useState({});
 
   function changeScreen(stateValue) {
     setForm(stateValue);
@@ -184,7 +183,11 @@ export default function Signup() {
             Signup
           </button>
         </div>
-        {form ? <LoginScreen /> : <SignupScreen />}
+        {form ? (
+          <LoginScreen userInfo={userInfo} setProfile={setProfile} />
+        ) : (
+          <SignupScreen setUserInfo={setUserInfo} />
+        )}
       </div>
     </div>
   );

@@ -5,31 +5,34 @@ import Post from "@/app/components/post";
 import Signup from "./components/signup";
 import { useEffect, useState } from "react";
 
-function LoggedIn({ profile }) {
+function LoggedIn({ profile, setProfile }) {
+  function handleSignOut() {
+    setProfile(null);
+  }
+
   return (
     <div>
       <Header />
-      {/* <h2>Hello, {profile.firstname}</h2> */}
+      <p>Hello {profile.firstname}</p>
+      <button className="regButton" onClick={handleSignOut}>
+        signout
+      </button>
+
       <div className="flex flex-col items-center justify-center h-full p-10 gap-6">
-        <Post caption="Baby" imageSrc="/images/1.JPEG" />
-        <Post caption="Hello" imageSrc="/images/3.JPEG" />
+        {/* <Post caption="Baby" imageSrc="/images/1.JPEG" />
+        <Post caption="Hello" imageSrc="/images/3.JPEG" /> */}
       </div>
     </div>
   );
 }
 
 export default function Home() {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [profileObj, setProfileObj] = useState(null);
-
-  useEffect(() => {
-    setCurrentUser(localStorage.getItem("currentUser"));
-    alert(currentUser);
-    setProfileObj(JSON.parse(localStorage.getItem(currentUser)));
-  }, []);
+  const [profile, setProfile] = useState({});
 
   // console.log(profileObj);
 
   // add a if check for null in profile if so render empty tag
-  return <div>{profileObj ? <LoggedIn /> : <Signup />}</div>;
+  if (profile === null)
+    return <LoggedIn setProfile={setProfile} profile={profile} />;
+  else return <Signup setProfile={setProfile} />;
 }
