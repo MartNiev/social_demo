@@ -1,18 +1,14 @@
-import fs from "fs/promises";
+import fs from "fs";
 import path from "path";
+import { cwd } from "node:process";
 
 export async function POST(req) {
   try {
     const data = await req.json();
 
-    const filePath = path.join(
-      "C:\Users\manie\Documents\VSCode\React Projects\social",
-      "data",
-      "data.json",
-    );
-    console.log(filePath);
+    const filePath = path.join(process.cwd(), "data", "data.json");
 
-    await fs.writeFileSync("filePath", JSON.stringify(data, null, 2), "utf-8");
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
 
     return Response.json({ success: true });
   } catch (error) {
@@ -23,6 +19,3 @@ export async function POST(req) {
     );
   }
 }
-
-const p = path.join(process.cwd(), "data", "data.json");
-console.log(p);
