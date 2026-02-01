@@ -1,7 +1,5 @@
 "use client";
-import { useState, useEffect, use } from "react";
-import { validateLogin } from "@/app/utils/validation";
-import { userInfo } from "node:os";
+import { useState, useEffect } from "react";
 
 function SignupScreen() {
   const [passwordMatch, setPasswordMatch] = useState(true);
@@ -59,18 +57,12 @@ function SignupScreen() {
   return (
     <div>
       <form id="signupForm" className="flex flex-col items-center gap-5 p-4">
-        {!passwordMatch ? (
+        {!passwordMatch && (
           <p className="formMessage" htmlFor="signupForm">
             Password DO NOT Match
           </p>
-        ) : (
-          <></>
         )}
-        {emptyFields ? (
-          <p className="formMessage">All fields are required</p>
-        ) : (
-          <></>
-        )}
+        {emptyFields && <p className="formMessage">All fields are required</p>}
 
         <input
           className="formInput"
@@ -129,82 +121,6 @@ function SignupScreen() {
           Submit
         </button>
       </form>
-    </div>
-  );
-}
-
-function LoginScreen({ setProfile }) {
-  const [loginInfo, setLoginInfo] = useState({ username: "", password: "" });
-  const [userValidated, setUserValidated] = useState(null);
-
-  function handleLogin() {
-    setUserValidated(validateLogin(loginInfo));
-    userValidated && setProfile();
-  }
-
-  return (
-    <>
-      {/* {!userExist && (
-        <p className="formMessage">
-          Username or Password Does Not Match Our records
-        </p>
-      )} */}
-      {!userValidated === false && (
-        <p className="formMessage">Username or Password is incorrect</p>
-      )}
-      <form className="flex flex-col items-center gap-5 p-4">
-        <input
-          className="formInput"
-          type="text"
-          placeholder="Username"
-          onChange={(e) => {
-            setLoginInfo({ ...loginInfo, username: e.target.value });
-          }}
-        />
-        <input
-          className="formInput"
-          type="password"
-          placeholder="Password"
-          onChange={(e) => {
-            setLoginInfo({ ...loginInfo, password: e.target.value });
-          }}
-        />
-        <button
-          // type={userExist ? "submit" : "button"}
-          type="button"
-          className="w-30 regButton"
-          onClick={handleLogin}
-        >
-          Submit
-        </button>
-      </form>
-    </>
-  );
-}
-
-export default function Signup({ setProfile }) {
-  const [form, setForm] = useState(true);
-
-  function changeScreen(stateValue) {
-    setForm(stateValue);
-  }
-
-  return (
-    <div className="flex w-screen h-screen">
-      <div className="flex-2 flex justify-center items-center bg-blue-400">
-        <h2 className="name">Social</h2>
-      </div>
-      <div className="flex-1 flex flex-col justify-center items-center bg-white">
-        <div className="flex justify-center gap-4 pb-3">
-          <button className="regButton" onClick={() => changeScreen(true)}>
-            Login
-          </button>
-          <button className="regButton" onClick={() => changeScreen(false)}>
-            Signup
-          </button>
-        </div>
-        {form ? <LoginScreen setProfile={setProfile} /> : <SignupScreen />}
-      </div>
     </div>
   );
 }

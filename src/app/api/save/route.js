@@ -4,11 +4,13 @@ import { cwd } from "node:process";
 
 export async function POST(req) {
   try {
-    const data = await req.json();
+    const object = await req.json();
+    console.log(object);
+    const filename = `${object.username}.json`;
 
-    const filePath = path.join(process.cwd(), "data", "data.json");
+    const filePath = path.join(process.cwd(), "users", filename);
 
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf-8");
+    fs.writeFileSync(filePath, JSON.stringify(object, null, 2), "utf-8");
 
     return Response.json({ success: true });
   } catch (error) {
