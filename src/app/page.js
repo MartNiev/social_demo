@@ -2,7 +2,7 @@
 
 import Header from "@/app/components/header";
 import Post from "@/app/components/post";
-import Signup from "./components/signup";
+import LandingPage from "./components/signup";
 import { useEffect, useState } from "react";
 
 function LoggedIn({ profile, setProfile }) {
@@ -34,5 +34,5 @@ export default function Home() {
   // add a if check for null in profile if so render empty tag
   if (profile === null)
     return <LoggedIn setProfile={setProfile} profile={profile} />;
-  else return <Signup setProfile={setProfile} />;
+  else return <LandingPage setProfile={setProfile} />;
 }

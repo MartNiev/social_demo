@@ -1,16 +1,17 @@
 import fs from "fs";
 import path from "path";
-import { cwd } from "node:process";
 
 export async function POST(req) {
   try {
-    const object = await req.json();
-    console.log(object);
+    const object = await req.json(); //JS object set by fetch() (not string)
+
     const filename = `${object.username}.json`;
 
     const filePath = path.join(process.cwd(), "users", filename);
 
-    fs.writeFileSync(filePath, JSON.stringify(object, null, 2), "utf-8");
+    console.log(filePath);
+
+    fs.writeFileSync(filePath, JSON.stringify(object, null, 2), "utf-8"); //writes file string version object to json file
 
     return Response.json({ success: true });
   } catch (error) {

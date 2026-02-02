@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 
-function SignupScreen() {
+export default function SignupScreen() {
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [emptyFields, setEmptyFields] = useState(false);
   const [userInput, setUserInput] = useState({
@@ -57,12 +57,18 @@ function SignupScreen() {
   return (
     <div>
       <form id="signupForm" className="flex flex-col items-center gap-5 p-4">
-        {!passwordMatch && (
+        {!passwordMatch ? (
           <p className="formMessage" htmlFor="signupForm">
             Password DO NOT Match
           </p>
+        ) : (
+          <></>
         )}
-        {emptyFields && <p className="formMessage">All fields are required</p>}
+        {emptyFields ? (
+          <p className="formMessage">All fields are required</p>
+        ) : (
+          <></>
+        )}
 
         <input
           className="formInput"
