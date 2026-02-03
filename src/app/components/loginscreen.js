@@ -6,22 +6,30 @@ export default function LoginScreen({ setProfile }) {
   const [userValidated, setUserValidated] = useState(null);
 
   function handleLogin() {
-    // setUserValidated(validateLogin(loginInfo));
-    // userValidated && setProfile();
+    // if (!(loginInfo.username && loginInfo.password)) return;
 
     async function loadUserProfile() {
       try {
-        const response = await fetch("/api/load");
-        const object = await response.json();
-        return object;
+        const response = await fetch("/api/load", {
+          headers: { Name: "manv" },
+        });
+        const storedUserInfo = await response.json();
+        setProfile(storedUserInfo);
 
-        if (!response.ok) throw new Error("Network response not ok");
+        console.log(storedUserInfo);
+        // Validation must occur here so I can use the object load
       } catch (error) {
-        Alert("Error fetching api: " + error);
+        alert("Error fetching api: " + error);
       }
     }
 
     loadUserProfile();
+
+    // setUserValidated(validateLogin(storeUserInfo, loginInfo));
+    // userValidated && setProfile();
+
+    // Take object and validate information entered with info in object
+    // And load the pass the profile object to the setProfile state
   }
 
   return (

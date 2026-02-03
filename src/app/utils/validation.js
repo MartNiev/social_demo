@@ -1,6 +1,6 @@
-export function validateLogin(loginObject) {
+export function validateLogin(storedObject, enteredInfo) {
   const password = loginObject.password;
 
-  // if (password === profile.password) return true;
-  // else false;
+  if (password === profile.password) return true;
+  else false;
 }
