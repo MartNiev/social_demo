@@ -3,43 +3,40 @@ import { validateLogin } from "@/app/utils/validation";
 
 export default function LoginScreen({ setProfile }) {
   const [loginInfo, setLoginInfo] = useState({ username: "", password: "" });
-  const [userValidated, setUserValidated] = useState(null);
+  const [validationMessage, setValidationMessage] = useState(true);
+
+  useEffect(() => {}, []);
 
   function handleLogin() {
-    // if (!(loginInfo.username && loginInfo.password)) return;
+    if (!(loginInfo.username && loginInfo.password)) return;
 
     async function loadUserProfile() {
       try {
-        const response = await fetch("/api/load", {
-          headers: { Name: "manv" },
-        });
+        const response = await fetch(`/api/load/?name=${loginInfo.username}`);
         const storedUserInfo = await response.json();
-        setProfile(storedUserInfo);
 
-        console.log(storedUserInfo);
-        // Validation must occur here so I can use the object load
+        const isValidated = validateLogin(storedUserInfo, loginInfo);
+
+        if (isValidated) {
+          setValidationMessage(true);
+          setProfile(storedUserInfo);
+        } else {
+          setValidationMessage(false);
+        }
+
+        //console.log(storedUserInfo);
+        //console.log(isValidated);
       } catch (error) {
         alert("Error fetching api: " + error);
       }
     }
 
     loadUserProfile();
-
-    // setUserValidated(validateLogin(storeUserInfo, loginInfo));
-    // userValidated && setProfile();
-
-    // Take object and validate information entered with info in object
-    // And load the pass the profile object to the setProfile state
   }
 
   return (
     <>
-      {/* {!userExist && (
-        <p className="formMessage">
-          Username or Password Does Not Match Our records
-        </p>
-      )} */}
-      {!userValidated === false && (
+      {!validationMessage && (
         <p className="formMessage">Username or Password is incorrect</p>
       )}
       <form className="flex flex-col items-center gap-5 p-4">

@@ -1,5 +1,10 @@
+import { Children } from "react";
 import "./components.css";
-export default function Header() {
+export default function Header({ setProfile }) {
+  function handleSignOut() {
+    setProfile(null);
+  }
+
   return (
     <div className="flex items-center justify-center w-full bg-white h-12.5 shadow-sm">
       <p className="w-45 flex-1 pl-5">The Social</p>
@@ -7,6 +12,9 @@ export default function Header() {
         <button className="bt">Home</button>
         <button className="bt">Create</button>
         <button className="bt">Follow</button>
+        <button className="bt" onClick={handleSignOut}>
+          Signout
+        </button>
       </nav>
       <div className="w-45 text-right flex-1 pr-5">
         <input

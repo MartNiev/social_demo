@@ -9,16 +9,21 @@ export async function POST(req) {
 
     const filePath = path.join(process.cwd(), "users", filename);
 
-    console.log(filePath);
+    const userListPath = path.join(process.cwd(), "users", "userList.json");
+
+    const userObject = JSON.parse(fs.readFileSync(userListPath, "utf-8"));
+    userObject.username.push(object.username);
 
     fs.writeFileSync(filePath, JSON.stringify(object, null, 2), "utf-8"); //writes file string version object to json file
+    fs.writeFileSync(
+      userListPath,
+      JSON.stringify(userObject, null, 2),
+      "utf-8",
+    );
 
     return Response.json({ success: true });
   } catch (error) {
     console.error("Error writing file:", error.message);
-    return Response.json(
-      { success: false, error: error.message },
-      { status: 500 },
-    );
+    return Response.json({ error: error.message }, { status: 500 });
   }
 }

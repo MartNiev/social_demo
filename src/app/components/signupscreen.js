@@ -1,9 +1,12 @@
 "use client";
 import { useState, useEffect, use } from "react";
+import Message from "@/app/components/uiMessage";
 
 export default function SignupScreen() {
-  const [passwordMatch, setPasswordMatch] = useState(true);
+  const [passwordNotMatch, setPasswordNotMatch] = useState(false);
   const [emptyFields, setEmptyFields] = useState(false);
+  const [userExist, setUserExist] = useState(null);
+  const [submitButton, setSubmitButton] = useState(true);
   const [userInput, setUserInput] = useState({
     firstname: "",
     lastname: "",
@@ -13,27 +16,32 @@ export default function SignupScreen() {
     confirm: "",
   });
 
-  useEffect(() => {}, [userInput]);
-
   function handleSignUp() {
-    console.log(userInput);
-    if (userInput.password !== userInput.confirm) {
-      setPasswordMatch(false);
+    if (
+      !(
+        userInput.firstname &&
+        userInput.lastname &&
+        userInput.age &&
+        userInput.username &&
+        userInput.password &&
+        userInput.confirm
+      )
+    ) {
+      setEmptyFields(true);
+      setSubmitButton(false);
       return;
     } else {
-      setPasswordMatch(true);
+      setEmptyFields(false);
+      setSubmitButton(true);
+    }
 
-      if (
-        !(
-          userInput.firstname &&
-          userInput.lastname &&
-          userInput.age &&
-          userInput.username &&
-          userInput.password &&
-          userInput.confirm
-        )
-      )
-        return setEmptyFields(true);
+    if (userInput.password !== userInput.confirm) {
+      setPasswordNotMatch(true);
+      setSubmitButton(true);
+      return;
+    } else {
+      setPasswordNotMatch(false);
+      setSubmitButton(false);
 
       async function saveProfile(profileObj) {
         try {
@@ -43,33 +51,48 @@ export default function SignupScreen() {
             body: JSON.stringify(profileObj),
           });
 
-          if (response.ok) {
+          if (!response.ok) {
           }
         } catch (error) {
-          alert("Error saving profile: " + error.message);
+          alert("Error saving profi " + error.message);
         }
       }
 
-      saveProfile(userInput);
+      async function loadUserList() {
+        try {
+          const response = await fetch("/api/load?name=userList");
+          const userList = await response.json();
+
+          for (const user of userList.username) {
+            if (userInput.username === user) {
+              setUserExist(true);
+              setSubmitButton(false);
+              return;
+            } else {
+              setUserExist(false);
+              setSubmitButton(true);
+            }
+          }
+
+          saveProfile(userInput);
+        } catch (error) {
+          alert("Error loading file: " + error.message);
+        }
+      }
+
+      loadUserList();
     }
   }
 
   return (
     <div>
       <form id="signupForm" className="flex flex-col items-center gap-5 p-4">
-        {!passwordMatch ? (
-          <p className="formMessage" htmlFor="signupForm">
-            Password DO NOT Match
-          </p>
-        ) : (
-          <></>
-        )}
-        {emptyFields ? (
-          <p className="formMessage">All fields are required</p>
-        ) : (
-          <></>
-        )}
-
+        <Message
+          condition={passwordNotMatch}
+          message="Password does NOT Match."
+        />
+        <Message condition={emptyFields} message="All fields are required." />
+        <Message condition={userExist} message="Username is Taken!" />
         <input
           className="formInput"
           type="text"
@@ -119,8 +142,8 @@ export default function SignupScreen() {
           }}
         />
         <button
-          type="button"
-          // type={passwordMatch ? "submit" : "button"}
+          //type="button"
+          type={submitButton ? "submit" : "button"}
           className="w-30 regButton"
           onClick={handleSignUp}
         >
