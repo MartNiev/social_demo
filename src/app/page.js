@@ -11,10 +11,11 @@ function LoggedIn({ profile, setProfile }) {
       <Header setProfile={setProfile}></Header>
       <p className="flex w-full p-5 justify-center align-middle text-lg">
         Hello {profile.firstname}
-      </p>{" "}
+      </p>
       <div className="flex flex-col items-center justify-center h-full p-10 gap-6">
-        <Post caption="Baby" imageSrc="/images/1.JPEG" />
-        <Post caption="Hello" imageSrc="/images/3.JPEG" />
+        {profile.posts.map((p, idx) => (
+          <Post {...p} key={idx + Math.random()} />
+        ))}
       </div>
     </div>
   );
@@ -24,7 +25,7 @@ export default function Home() {
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    //console.log(profile);
+    //console.log(profile.posts);
   });
 
   // add a if check for null in profile if so render empty tag
