@@ -6,7 +6,7 @@ export default function SignupScreen() {
   const [passwordNotMatch, setPasswordNotMatch] = useState(false);
   const [emptyFields, setEmptyFields] = useState(false);
   const [userExist, setUserExist] = useState(null);
-  const [submitButton, setSubmitButton] = useState(true);
+  const [submitButton, setSubmitButton] = useState(false);
   const [userInput, setUserInput] = useState({
     firstname: "",
     lastname: "",
@@ -14,7 +14,34 @@ export default function SignupScreen() {
     username: "",
     password: "",
     confirm: "",
+    posts: [],
   });
+
+  function checkUsername() {
+    console.log("Checking Name");
+    async function loadUserList() {
+      try {
+        const response = await fetch("/api/load?name=userList");
+        const userList = await response.json();
+
+        for (const user of userList.username) {
+          if (userInput.username === user) {
+            setUserExist(true);
+            return;
+          }
+        }
+
+        setUserExist(false);
+        setSubmitButton(true);
+
+        console.log(submitButton);
+      } catch (error) {
+        alert("Error loading file: " + error.message);
+      }
+    }
+
+    loadUserList();
+  }
 
   function handleSignUp() {
     if (
@@ -32,16 +59,15 @@ export default function SignupScreen() {
       return;
     } else {
       setEmptyFields(false);
-      setSubmitButton(true);
     }
 
     if (userInput.password !== userInput.confirm) {
       setPasswordNotMatch(true);
-      setSubmitButton(true);
+      setSubmitButton(false);
       return;
     } else {
       setPasswordNotMatch(false);
-      setSubmitButton(false);
+      setSubmitButton(true);
 
       async function saveProfile(profileObj) {
         try {
@@ -50,37 +76,12 @@ export default function SignupScreen() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(profileObj),
           });
-
-          if (!response.ok) {
-          }
         } catch (error) {
-          alert("Error saving profi " + error.message);
+          alert("Error saving profile: " + error.message);
         }
       }
 
-      async function loadUserList() {
-        try {
-          const response = await fetch("/api/load?name=userList");
-          const userList = await response.json();
-
-          for (const user of userList.username) {
-            if (userInput.username === user) {
-              setUserExist(true);
-              setSubmitButton(false);
-              return;
-            } else {
-              setUserExist(false);
-              setSubmitButton(true);
-            }
-          }
-
-          saveProfile(userInput);
-        } catch (error) {
-          alert("Error loading file: " + error.message);
-        }
-      }
-
-      loadUserList();
+      if (!userExist) saveProfile(userInput);
     }
   }
 
@@ -91,7 +92,10 @@ export default function SignupScreen() {
           condition={passwordNotMatch}
           message="Password does NOT Match."
         />
-        <Message condition={emptyFields} message="All fields are required." />
+        {!userExist && (
+          <Message condition={emptyFields} message="All fields are required." />
+        )}
+
         <Message condition={userExist} message="Username is Taken!" />
         <input
           className="formInput"
@@ -123,6 +127,7 @@ export default function SignupScreen() {
           placeholder="Username"
           onChange={(e) => {
             setUserInput({ ...userInput, username: e.target.value });
+            checkUsername();
           }}
         />
         <input
